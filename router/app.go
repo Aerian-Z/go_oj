@@ -15,14 +15,15 @@ func Router() *gin.Engine {
 
 	// routers
 
-	// problems
+	// problem
 	r.GET("/problem-list", service.GetProblemList)
 	r.GET("/problem-detail", service.GetProblemDetail)
 
-	// users
+	// user
 	r.GET("/user-detail", service.GetUserDetail)
+	r.POST("/login", service.Login)
 
-	// submits
+	// submit
 	r.GET("/submit-list", service.GetSubmitList)
 
 	return r
