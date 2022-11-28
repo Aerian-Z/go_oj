@@ -25,3 +25,8 @@ Install jwt
 ```shell
 go get github.com/dgrijalva/jwt-go
 ```
+
+Install mail
+```shell
+go get github.com/jordan-wright/email
+```

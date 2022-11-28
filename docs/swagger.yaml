@@ -62,6 +62,21 @@ paths:
       summary: 问题列表
       tags:
       - 公共方法
+  /send-code:
+    post:
+      parameters:
+      - description: email
+        in: formData
+        name: email
+        type: string
+      responses:
+        "200":
+          description: '{"code":"200","msg":""}'
+          schema:
+            type: string
+      summary: 发送验证码
+      tags:
+      - 公共方法
   /submit-list:
     get:
       parameters:

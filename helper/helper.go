@@ -4,6 +4,8 @@ import (
 	"crypto/md5"
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
+	"github.com/jordan-wright/email"
+	"net/smtp"
 )
 
 type UserClaims struct {
@@ -45,4 +47,27 @@ func AnalysisToken(tokenString string) (*UserClaims, error) {
 	} else {
 		return nil, fmt.Errorf("token is invalid")
 	}
+}
+
+// SendCode
+// send verification code to the user's mailbox
+func SendCode(toUserEmail, code string) error {
+	host := "smtp.qq.com"
+	port := "25"
+	username := "meet.yuzhang@qq.com"
+	password := "ahcgdolgclwohica"
+
+	e := &email.Email{
+		From:    username,
+		To:      []string{toUserEmail},
+		Subject: "Verification Code Sending Test",
+		HTML:    []byte("Your Verification Code is<h1>" + code + "</h1>"),
+	}
+
+	return e.Send(host+":"+port, smtp.PlainAuth("", username, password, host))
+}
+
+// get random code
+func GetRandomCode() string {
+	return "123456"
 }
