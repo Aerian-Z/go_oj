@@ -12,6 +12,7 @@ type ProblemBasic struct {
 	MaxRuntime      int                `gorm:"column:max_runtime; type:int; json:"max_runtime"`   // max runtime of the problem
 	MaxMemory       int                `gorm:"column:max_memory; type:int; json:"max_memory"`     // max memory of the problem
 	ProblemCategory []*ProblemCategory `gorm:"foreignKey:problem_id; references:id; json:"problem_categories"`
+	TestCases       []*TestCase        `gorm:"foreignKey:problem_identity; references:identity; json:"test_cases"`
 }
 
 func (table *ProblemBasic) TableName() string {

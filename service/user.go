@@ -1,11 +1,15 @@
 package service
 
 import (
+	"GOOJ/define"
 	"GOOJ/helper"
 	"GOOJ/models"
+	"encoding/json"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
+	"log"
 	"net/http"
+	"strconv"
 	"time"
 )
 
@@ -76,7 +80,7 @@ func Login(c *gin.Context) {
 		return
 	}
 
-	token, err := helper.GenerateToken(data.Identity, data.Username)
+	token, err := helper.GenerateToken(data.Identity, data.Username, data.IsAdmin)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"code": -1,
@@ -196,7 +200,7 @@ func Register(c *gin.Context) {
 	}
 
 	// generate token
-	token, err := helper.GenerateToken(data.Identity, data.Username)
+	token, err := helper.GenerateToken(data.Identity, data.Username, data.IsAdmin)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"code": -1,
@@ -211,6 +215,142 @@ func Register(c *gin.Context) {
 			"identity": data.Identity,
 			"username": data.Username,
 			"token":    token,
+		},
+	})
+}
+
+// GetRankList
+// @Tags 公共方法
+// @Summary 排行榜
+// @Param page formData string false "page"
+// @Param size formData string false "size"
+// @Success 200 {string} json "{"code":"200","msg":""}"
+// @Router /rank-list [get]
+func GetRankList(c *gin.Context) {
+	page, err := strconv.Atoi(c.DefaultQuery("page", define.DefaultPage))
+	if err != nil {
+		log.Println("GetRankList Page strconv error: ", err)
+		return
+	}
+	size, _ := strconv.Atoi(c.DefaultQuery("size", define.DefaultSize))
+	page = (page - 1) * size
+
+	var count int64
+	list := make([]models.UserBasic, 0)
+	err = models.DB.Model(&models.UserBasic{}).Count(&count).Order("finish_problem_num DESC, submit_num ASC").Offset(page).Limit(size).Find(&list).Error
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{
+			"code": -1,
+			"msg":  "get rank list error: " + err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"code": 200,
+		"data": map[string]interface{}{
+			"list":  list,
+			"count": count,
+		},
+	})
+}
+
+// ProblemCreate
+// @Tags 私有方法
+// @Summary 问题创建
+// @Param authorization header string true "authorization"
+// @Param title formData string true "title"
+// @Param content formData string true "content"
+// @Param max_runtime formData string false "max_runtime"
+// @Param max_memory formData string false "max_memory"
+// @Param category_ids formData array false "category_ids"
+// @Param test_cases formData array true "test_cases"
+// @Success 200 {string} json "{"code":"200","msg":""}"
+// @Router /problem-create [post]
+func ProblemCreate(c *gin.Context) {
+	title := c.PostForm("title")
+	content := c.PostForm("content")
+	maxRuntime, _ := strconv.Atoi(c.PostForm("max_runtime"))
+	maxMemory, _ := strconv.Atoi(c.PostForm("max_memory"))
+	categoryIds := c.PostFormArray("category_ids")
+	testCases := c.PostFormArray("test_cases")
+
+	// check params
+	if title == "" || content == "" || len(testCases) == 0 {
+		c.JSON(http.StatusOK, gin.H{
+			"code": -1,
+			"msg":  "params is empty",
+		})
+		return
+	}
+
+	data := &models.ProblemBasic{
+		Identity:   helper.GetUUID(),
+		Title:      title,
+		Content:    content,
+		MaxRuntime: maxRuntime,
+		MaxMemory:  maxMemory,
+	}
+
+	problemCategories := make([]*models.ProblemCategory, 0)
+	for _, id := range categoryIds {
+		categoryId, _ := strconv.Atoi(id)
+		problemCategories = append(problemCategories, &models.ProblemCategory{
+			ProblemId:  data.ID,
+			CategoryId: uint(categoryId),
+		})
+	}
+	data.ProblemCategory = problemCategories
+
+	// {"input":"1 2\n", "output":"3\n"}
+	testCaseBasics := make([]*models.TestCase, 0)
+	for _, testCase := range testCases {
+		caseMap := make(map[string]string)
+		err := json.Unmarshal([]byte(testCase), &caseMap)
+		if err != nil {
+			c.JSON(http.StatusOK, gin.H{
+				"code": -1,
+				"msg":  "test case error: " + err.Error(),
+			})
+			return
+		}
+		if _, ok := caseMap["input"]; !ok {
+			c.JSON(http.StatusOK, gin.H{
+				"code": -1,
+				"msg":  "test case input is empty",
+			})
+			return
+		}
+		if _, ok := caseMap["output"]; !ok {
+			c.JSON(http.StatusOK, gin.H{
+				"code": -1,
+				"msg":  "test case output is empty",
+			})
+			return
+		}
+		testCaseBasic := &models.TestCase{
+			Identity:        helper.GetUUID(),
+			ProblemIdentity: data.Identity,
+			Input:           caseMap["input"],
+			Output:          caseMap["output"],
+		}
+		testCaseBasics = append(testCaseBasics, testCaseBasic)
+	}
+	data.TestCases = testCaseBasics
+
+	// create problem
+	err := models.DB.Create(&data).Error
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{
+			"code": -1,
+			"msg":  "create problem error: " + err.Error(),
+		})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"code": 200,
+		"data": map[string]interface{}{
+			"identity": data.Identity,
 		},
 	})
 }

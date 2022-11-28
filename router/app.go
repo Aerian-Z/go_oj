@@ -2,6 +2,7 @@ package router
 
 import (
 	_ "GOOJ/docs"
+	"GOOJ/middlewares"
 	"GOOJ/service"
 	"github.com/gin-gonic/gin"
 	swaggerfiles "github.com/swaggo/files"
@@ -15,6 +16,7 @@ func Router() *gin.Engine {
 
 	// routers
 
+	// public method
 	// problem
 	r.GET("/problem-list", service.GetProblemList)
 	r.GET("/problem-detail", service.GetProblemDetail)
@@ -24,9 +26,13 @@ func Router() *gin.Engine {
 	r.POST("/login", service.Login)
 	r.POST("/send-code", service.SendCode)
 	r.POST("/register", service.Register)
+	r.GET("/rank-list", service.GetRankList)
 
 	// submit
 	r.GET("/submit-list", service.GetSubmitList)
+
+	// private method of administrator
+	r.POST("problem-create", middlewares.AuthAdminCheck(), service.ProblemCreate)
 
 	return r
 }

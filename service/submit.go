@@ -22,7 +22,7 @@ import (
 func GetSubmitList(c *gin.Context) {
 	page, err := strconv.Atoi(c.DefaultQuery("page", define.DefaultPage))
 	if err != nil {
-		log.Println("GetProblemList Page strconv error: ", err)
+		log.Println("GetSubmitList Page strconv error: ", err)
 		return
 	}
 	size, _ := strconv.Atoi(c.DefaultQuery("size", define.DefaultSize))

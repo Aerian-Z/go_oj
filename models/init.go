@@ -31,11 +31,12 @@ func Init() *gorm.DB {
 	// SetConnMaxLifetime 设置了连接可复用的最大时间。
 	sqlDB.SetConnMaxLifetime(10 * time.Second)
 
-	//db.AutoMigrate(&CategoryBasic{})
-	//db.AutoMigrate(&ProblemBasic{})
-	//db.AutoMigrate(&SubmitBasic{})
+	db.AutoMigrate(&CategoryBasic{})
+	db.AutoMigrate(&ProblemBasic{})
+	db.AutoMigrate(&SubmitBasic{})
 	db.AutoMigrate(&UserBasic{})
-	//db.AutoMigrate(&ProblemCategory{})
+	db.AutoMigrate(&ProblemCategory{})
+	db.AutoMigrate(&TestCase{})
 	return db
 }
 
