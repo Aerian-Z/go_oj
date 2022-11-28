@@ -5,7 +5,10 @@ import (
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/jordan-wright/email"
+	uuid "github.com/satori/go.uuid"
+	"math/rand"
 	"net/smtp"
+	"time"
 )
 
 type UserClaims struct {
@@ -60,14 +63,22 @@ func SendCode(toUserEmail, code string) error {
 	e := &email.Email{
 		From:    username,
 		To:      []string{toUserEmail},
-		Subject: "Verification Code Sending Test",
-		HTML:    []byte("Your Verification Code is<h1>" + code + "</h1>"),
+		Subject: "Verification code has been sent, please check",
+		HTML:    []byte("Your verification code is <h1>" + code + "</h1>"),
 	}
 
 	return e.Send(host+":"+port, smtp.PlainAuth("", username, password, host))
 }
 
-// get random code
 func GetRandomCode() string {
-	return "123456"
+	rand.Seed(time.Now().UnixNano())
+	code := ""
+	for i := 0; i < 6; i++ {
+		code += fmt.Sprintf("%d", rand.Intn(10))
+	}
+	return code
+}
+
+func GetUUID() string {
+	return uuid.NewV4().String()
 }

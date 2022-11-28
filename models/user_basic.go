@@ -8,7 +8,7 @@ type UserBasic struct {
 	Username string `gorm:"column:username; type:varchar(255); json:"username"`
 	Password string `gorm:"column:password; type:varchar(255); json:"password"`
 	Phone    string `gorm:"column:phone; type:varchar(255); json:"phone"`
-	Mail     string
+	Email    string `gorm:"column:email; type:varchar(255); json:"email"`
 }
 
 func (table *UserBasic) TableName() string {

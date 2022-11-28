@@ -1,6 +1,7 @@
 package models
 
 import (
+	"github.com/go-redis/redis/v8"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"log"
@@ -8,6 +9,8 @@ import (
 )
 
 var DB = Init()
+
+var RDB = InitRedisDB()
 
 func Init() *gorm.DB {
 	// 参考 https://github.com/go-sql-driver/mysql#dsn-data-source-name 获取详情
@@ -28,10 +31,19 @@ func Init() *gorm.DB {
 	// SetConnMaxLifetime 设置了连接可复用的最大时间。
 	sqlDB.SetConnMaxLifetime(10 * time.Second)
 
-	db.AutoMigrate(&CategoryBasic{})
-	db.AutoMigrate(&ProblemBasic{})
-	db.AutoMigrate(&SubmitBasic{})
+	//db.AutoMigrate(&CategoryBasic{})
+	//db.AutoMigrate(&ProblemBasic{})
+	//db.AutoMigrate(&SubmitBasic{})
 	db.AutoMigrate(&UserBasic{})
-	db.AutoMigrate(&ProblemCategory{})
+	//db.AutoMigrate(&ProblemCategory{})
 	return db
+}
+
+func InitRedisDB() *redis.Client {
+	var rdb = redis.NewClient(&redis.Options{
+		Addr:     "localhost:6379",
+		Password: "", // no password set
+		DB:       0,  // use default DB
+	})
+	return rdb
 }
