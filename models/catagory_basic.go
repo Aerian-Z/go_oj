@@ -12,3 +12,7 @@ type CategoryBasic struct {
 func (table *CategoryBasic) TableName() string {
 	return "category_basic"
 }
+
+func GetCategoryList(keyword string) *gorm.DB {
+	return DB.Model(new(CategoryBasic)).Where("name LIKE ? ", "%"+keyword+"%")
+}

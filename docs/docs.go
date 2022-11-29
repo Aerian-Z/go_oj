@@ -16,23 +16,31 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/login": {
+        "/admin/category-create": {
             "post": {
                 "tags": [
-                    "公共方法"
+                    "私有方法"
                 ],
-                "summary": "用户登录",
+                "summary": "分类创建",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "username",
-                        "name": "username",
-                        "in": "formData"
+                        "description": "authorization",
+                        "name": "authorization",
+                        "in": "header",
+                        "required": true
                     },
                     {
                         "type": "string",
-                        "description": "password",
-                        "name": "password",
+                        "description": "name",
+                        "name": "name",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "parent_id",
+                        "name": "parent_id",
                         "in": "formData"
                     }
                 ],
@@ -46,7 +54,83 @@ const docTemplate = `{
                 }
             }
         },
-        "/problem-create": {
+        "/admin/category-delete": {
+            "delete": {
+                "tags": [
+                    "私有方法"
+                ],
+                "summary": "分类删除",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "authorization",
+                        "name": "authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "identity",
+                        "name": "identity",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{\"code\":\"200\",\"msg\":\"\"}",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/category-modify": {
+            "put": {
+                "tags": [
+                    "私有方法"
+                ],
+                "summary": "分类修改",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "authorization",
+                        "name": "authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "identity",
+                        "name": "identity",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "name",
+                        "name": "name",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "parent_id",
+                        "name": "parent_id",
+                        "in": "formData"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{\"code\":\"200\",\"msg\":\"\"}",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/problem-create": {
             "post": {
                 "tags": [
                     "私有方法"
@@ -98,6 +182,72 @@ const docTemplate = `{
                         "name": "test_cases",
                         "in": "formData",
                         "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{\"code\":\"200\",\"msg\":\"\"}",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/category-list": {
+            "get": {
+                "tags": [
+                    "公共方法"
+                ],
+                "summary": "分类列表",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "page",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "size",
+                        "name": "size",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "keyword",
+                        "name": "keyword",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{\"code\":\"200\",\"msg\":\"\"}",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/login": {
+            "post": {
+                "tags": [
+                    "公共方法"
+                ],
+                "summary": "用户登录",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "username",
+                        "name": "username",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "password",
+                        "name": "password",
+                        "in": "formData"
                     }
                 ],
                 "responses": {

@@ -19,7 +19,7 @@ func AuthAdminCheck() gin.HandlerFunc {
 			c.Abort()
 			return
 		}
-		if userClaims.IsAdmin != 1 {
+		if userClaims == nil || userClaims.IsAdmin != 1 {
 			c.JSON(http.StatusOK, gin.H{
 				"code": -1,
 				"msg":  "you are not admin",

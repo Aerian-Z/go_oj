@@ -38,8 +38,8 @@ go get github.com/jordan-wright/email
     * [X] user detail
   * [ ] Problem Module
     * [X] problem list、problem detail
-    * [ ] create problem
-    * [ ] modify problem
+    * [ ] problem create
+    * [ ] problem modify
   * [ ] Judge Module
     * [X] submit list
     * [ ] submit and judge

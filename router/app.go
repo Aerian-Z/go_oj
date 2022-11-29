@@ -27,12 +27,16 @@ func Router() *gin.Engine {
 	r.POST("/send-code", service.SendCode)
 	r.POST("/register", service.Register)
 	r.GET("/rank-list", service.GetRankList)
+	r.GET("/category-list", service.GetCategoryList)
 
 	// submit
 	r.GET("/submit-list", service.GetSubmitList)
 
 	// private method of administrator
-	r.POST("problem-create", middlewares.AuthAdminCheck(), service.ProblemCreate)
+	r.POST("/admin/problem-create", middlewares.AuthAdminCheck(), service.ProblemCreate)
+	r.POST("/admin/category-create", middlewares.AuthAdminCheck(), service.CategoryCreate)
+	r.DELETE("/admin/category-delete", middlewares.AuthAdminCheck(), service.CategoryDelete)
+	r.PUT("/admin/category-modify", middlewares.AuthAdminCheck(), service.CategoryModify)
 
 	return r
 }
