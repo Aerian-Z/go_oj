@@ -4,7 +4,7 @@ import "gorm.io/gorm"
 
 type CategoryBasic struct {
 	gorm.Model
-	Identity string `gorm:"column:identity; type:varchar(36); json:"identity"` // unique identification of the category table
+	Identity string `gorm:"column:identity; type:varchar(255); json:"identity"` // unique identification of the category table
 	Name     string `gorm:"column:name; type:varchar(255); json:"name"`
 	ParentId int    `gorm:"column:parent_id; type:int; json:"parent_id"`
 }

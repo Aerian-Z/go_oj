@@ -190,3 +190,137 @@ func ProblemCreate(c *gin.Context) {
 		},
 	})
 }
+
+// ProblemModify
+// @Tags 私有方法
+// @Summary 问题修改
+// @Param authorization header string true "authorization"
+// @Param identity query string true "identity"
+// @Param title formData string false "title"
+// @Param content formData string false "content"
+// @Param max_runtime formData string false "max_runtime"
+// @Param max_memory formData string false "max_memory"
+// @Param category_ids formData array false "category_ids"
+// @Param test_cases formData array false "test_cases"
+// @Success 200 {string} json "{"code":"200","msg":""}"
+// @Router /admin/problem-modify [put]
+func ProblemModify(c *gin.Context) {
+	identity := c.Query("identity")
+	title := c.PostForm("title")
+	content := c.PostForm("content")
+	maxRuntime, _ := strconv.Atoi(c.PostForm("max_runtime"))
+	maxMemory, _ := strconv.Atoi(c.PostForm("max_memory"))
+	categoryIds := c.PostFormArray("category_ids")
+	testCases := c.PostFormArray("test_cases")
+
+	// check params
+	if identity == "" {
+		c.JSON(http.StatusOK, gin.H{
+			"code": -1,
+			"msg":  "params is empty",
+		})
+		return
+	}
+
+	err := models.DB.Transaction(func(tx *gorm.DB) error {
+		// update problem
+		data := &models.ProblemBasic{
+			Identity:   identity,
+			Title:      title,
+			Content:    content,
+			MaxRuntime: maxRuntime,
+			MaxMemory:  maxMemory,
+		}
+
+		// query problem detail
+		err := tx.Model(&models.ProblemBasic{}).Where("identity = ?", identity).Find(&data).Error
+		if err != nil {
+			return err
+		}
+
+		// update problem category
+		if len(categoryIds) > 0 {
+			// delete old problem category
+			err = tx.Where("problem_id = ?", data.ID).Delete(&models.ProblemCategory{}).Error
+			if err != nil {
+				return err
+			}
+			// update problem category
+			problemCategories := make([]*models.ProblemCategory, 0)
+			for _, id := range categoryIds {
+				categoryId, _ := strconv.Atoi(id)
+				problemCategories = append(problemCategories, &models.ProblemCategory{
+					ProblemId:  data.ID,
+					CategoryId: uint(categoryId),
+				})
+			}
+			// create new problem category
+			err = tx.Create(&problemCategories).Error
+			if err != nil {
+				return err
+			}
+			data.ProblemCategory = problemCategories
+		}
+
+		if len(testCases) > 0 {
+			// delete old test case
+			err = tx.Where("problem_identity = ?", data.Identity).Delete(&models.TestCase{}).Error
+			if err != nil {
+				return err
+			}
+			// {"input":"1 2\n", "output":"3\n"}
+			testCaseBasics := make([]*models.TestCase, 0)
+			for _, testCase := range testCases {
+				caseMap := make(map[string]string)
+				err = json.Unmarshal([]byte(testCase), &caseMap)
+				if err != nil {
+					return err
+				}
+				if _, ok := caseMap["input"]; !ok {
+					c.JSON(http.StatusOK, gin.H{
+						"code": -1,
+						"msg":  "test case input is empty",
+					})
+					return nil
+				}
+				if _, ok := caseMap["output"]; !ok {
+					c.JSON(http.StatusOK, gin.H{
+						"code": -1,
+						"msg":  "test case output is empty",
+					})
+					return nil
+				}
+				testCaseBasic := &models.TestCase{
+					Identity:        helper.GetUUID(),
+					ProblemIdentity: data.Identity,
+					Input:           caseMap["input"],
+					Output:          caseMap["output"],
+				}
+				testCaseBasics = append(testCaseBasics, testCaseBasic)
+
+				// create new test case
+				err = tx.Create(&testCaseBasic).Error
+				if err != nil {
+					return err
+				}
+				data.TestCases = testCaseBasics
+			}
+		}
+
+		// update problem
+		return tx.Model(&models.ProblemBasic{}).Where("identity = ?", identity).Updates(&data).Error
+	})
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{
+			"code": -1,
+			"msg":  "modify problem error: " + err.Error(),
+		})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"code": 200,
+		"data": map[string]interface{}{
+			"identity": identity,
+		},
+	})
+}

@@ -33,10 +33,13 @@ func Router() *gin.Engine {
 	r.GET("/submit-list", service.GetSubmitList)
 
 	// private method of administrator
-	r.POST("/admin/problem-create", middlewares.AuthAdminCheck(), service.ProblemCreate)
-	r.POST("/admin/category-create", middlewares.AuthAdminCheck(), service.CategoryCreate)
-	r.DELETE("/admin/category-delete", middlewares.AuthAdminCheck(), service.CategoryDelete)
-	r.PUT("/admin/category-modify", middlewares.AuthAdminCheck(), service.CategoryModify)
-
+	authAdmin := r.Group("/admin").Use(middlewares.AuthAdminCheck())
+	{
+		authAdmin.POST("/problem-create", service.ProblemCreate)
+		authAdmin.PUT("/problem-modify", service.ProblemModify)
+		authAdmin.POST("/category-create", service.CategoryCreate)
+		authAdmin.DELETE("/category-delete", service.CategoryDelete)
+		authAdmin.PUT("/category-modify", service.CategoryModify)
+	}
 	return r
 }

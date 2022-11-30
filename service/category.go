@@ -64,7 +64,7 @@ func CategoryCreate(c *gin.Context) {
 		Name:     name,
 		ParentId: parentId,
 	}
-	err := models.DB.Create(category).Error
+	err := models.DB.Create(&category).Error
 	if err != nil {
 		log.Println("Create Category Error: ", err)
 		return
@@ -84,9 +84,18 @@ func CategoryCreate(c *gin.Context) {
 // @Router /admin/category-delete [delete]
 func CategoryDelete(c *gin.Context) {
 	identity := c.Query("identity")
-	//err := models.DB.Where("category_id = (SELECT id FROM category_basic WHERE identity = ? LIMIT 1)", identity).
-	//	Delete(&models.CategoryBasic{}).Error
-	err := models.DB.Where("identity = ?", identity).Delete(&models.CategoryBasic{}).Error
+	var count int64
+	err := models.DB.Where("category_id = (SELECT id FROM category_basic WHERE identity = ? LIMIT 1)", identity).
+		Count(&count).Error
+	if count > 0 {
+		c.JSON(http.StatusOK, gin.H{
+			"code": 200,
+			"msg":  "category has problem",
+		})
+		return
+	}
+
+	err = models.DB.Where("identity = ?", identity).Delete(&models.CategoryBasic{}).Error
 	if err != nil {
 		log.Println("Delete Category Error: ", err)
 		return
@@ -115,7 +124,7 @@ func CategoryModify(c *gin.Context) {
 		Name:     name,
 		ParentId: parentId,
 	}
-	err := models.DB.Model(new(models.CategoryBasic)).Where("identity = ?", identity).Updates(category).Error
+	err := models.DB.Model(new(models.CategoryBasic)).Where("identity = ?", identity).Updates(&category).Error
 	if err != nil {
 		log.Println("Modify Category Error: ", err)
 		return

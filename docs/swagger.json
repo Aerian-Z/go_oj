@@ -182,6 +182,74 @@
                 }
             }
         },
+        "/admin/problem-modify": {
+            "put": {
+                "tags": [
+                    "私有方法"
+                ],
+                "summary": "问题修改",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "authorization",
+                        "name": "authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "identity",
+                        "name": "identity",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "title",
+                        "name": "title",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "content",
+                        "name": "content",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "max_runtime",
+                        "name": "max_runtime",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "max_memory",
+                        "name": "max_memory",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "array",
+                        "description": "category_ids",
+                        "name": "category_ids",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "array",
+                        "description": "test_cases",
+                        "name": "test_cases",
+                        "in": "formData"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{\"code\":\"200\",\"msg\":\"\"}",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/category-list": {
             "get": {
                 "tags": [
