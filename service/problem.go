@@ -92,7 +92,7 @@ func GetProblemDetail(c *gin.Context) {
 }
 
 // ProblemCreate
-// @Tags 私有方法
+// @Tags 管理员私有方法
 // @Summary 问题创建
 // @Param authorization header string true "authorization"
 // @Param title formData string true "title"
@@ -175,7 +175,7 @@ func ProblemCreate(c *gin.Context) {
 	data.TestCases = testCaseBasics
 
 	// create problem
-	err := models.DB.Create(&data).Error
+	err := models.DB.Create(data).Error
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"code": -1,
@@ -192,7 +192,7 @@ func ProblemCreate(c *gin.Context) {
 }
 
 // ProblemModify
-// @Tags 私有方法
+// @Tags 管理员私有方法
 // @Summary 问题修改
 // @Param authorization header string true "authorization"
 // @Param identity query string true "identity"
@@ -233,7 +233,7 @@ func ProblemModify(c *gin.Context) {
 		}
 
 		// query problem detail
-		err := tx.Model(&models.ProblemBasic{}).Where("identity = ?", identity).Find(&data).Error
+		err := tx.Model(&models.ProblemBasic{}).Where("identity = ?", identity).Find(data).Error
 		if err != nil {
 			return err
 		}
@@ -308,7 +308,7 @@ func ProblemModify(c *gin.Context) {
 		}
 
 		// update problem
-		return tx.Model(&models.ProblemBasic{}).Where("identity = ?", identity).Updates(&data).Error
+		return tx.Model(&models.ProblemBasic{}).Where("identity = ?", identity).Updates(data).Error
 	})
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{

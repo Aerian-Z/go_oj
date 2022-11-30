@@ -2,8 +2,11 @@ package service
 
 import (
 	"GOOJ/define"
+	"GOOJ/helper"
 	"GOOJ/models"
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
+	"io"
 	"log"
 	"net/http"
 	"strconv"
@@ -46,6 +49,86 @@ func GetSubmitList(c *gin.Context) {
 		"data": map[string]interface{}{
 			"list":  data,
 			"count": count,
+		},
+	})
+}
+
+// Submit
+// @Tags 用户私有方法
+// @Summary 代码提交
+// @Param authorization header string true "authorization"
+// @Param problem_identity query string true "problem_identity"
+// @Param code body string true "code"
+// @Success 200 {string} json "{"code":"200","data":""}"
+// @Router /user/submit [post]
+func Submit(c *gin.Context) {
+	problemIdentity := c.Query("problem_identity")
+	code, err := io.ReadAll(c.Request.Body)
+	if err != nil {
+		log.Println("Submit ReadAll Error: ", err)
+		return
+	}
+
+	path, err := helper.CodeSave(code)
+	if err != nil {
+		log.Println("Submit CodeSave Error: ", err)
+		return
+	}
+
+	userClaims, _ := c.Get("user")
+	data := &models.SubmitBasic{
+		Identity:        helper.GetUUID(),
+		ProblemIdentity: problemIdentity,
+		UserIdentity:    userClaims.(*helper.UserClaims).Identity,
+		Path:            path,
+	}
+
+	// judge code
+	pb := new(models.ProblemBasic)
+	err = models.DB.Where("identity = ?", problemIdentity).Preload("TestCases").First(pb).Error
+	if err != nil {
+		log.Println("Submit Get ProblemBasic Error: ", err)
+		return
+	}
+	status := helper.JudgeCode(pb, path)
+	data.Status = status
+
+	err = models.DB.Transaction(func(tx *gorm.DB) error {
+		err = tx.Create(data).Error
+		if err != nil {
+			log.Println("Submit Create Error: ", err)
+			return err
+		}
+		err = tx.Model(&models.ProblemBasic{}).Where("identity = ?", problemIdentity).Update("submit_num", gorm.Expr("submit_num + ?", 1)).Error
+		if err != nil {
+			log.Println("Submit Update Error: ", err)
+			return err
+		}
+		err = tx.Model(&models.UserBasic{}).Where("identity = ?", userClaims.(*helper.UserClaims).Identity).Update("submit_num", gorm.Expr("submit_num + ?", 1)).Error
+		if err != nil {
+			log.Println("Submit Update Error: ", err)
+			return err
+		}
+		if status == 1 {
+			err = tx.Model(&models.ProblemBasic{}).Where("identity = ?", problemIdentity).Update("pass_num", gorm.Expr("pass_num + ?", 1)).Error
+			if err != nil {
+				log.Println("Submit Update Error: ", err)
+				return err
+			}
+			err = tx.Model(&models.UserBasic{}).Where("identity = ?", userClaims.(*helper.UserClaims).Identity).Update("pass_num", gorm.Expr("pass_num + ?", 1)).Error
+			if err != nil {
+				log.Println("Submit Update Error: ", err)
+				return err
+			}
+		}
+		return nil
+	})
+
+	c.JSON(http.StatusOK, gin.H{
+		"code": 200,
+		"data": map[string]interface{}{
+			"status": data.Status,
+			"msg":    define.StatusMsg[data.Status],
 		},
 	})
 }

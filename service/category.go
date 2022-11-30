@@ -49,7 +49,7 @@ func GetCategoryList(c *gin.Context) {
 }
 
 // CategoryCreate
-// @Tags 私有方法
+// @Tags 管理员私有方法
 // @Summary 分类创建
 // @Param authorization header string true "authorization"
 // @Param name formData string true "name"
@@ -76,7 +76,7 @@ func CategoryCreate(c *gin.Context) {
 }
 
 // CategoryDelete
-// @Tags 私有方法
+// @Tags 管理员私有方法
 // @Summary 分类删除
 // @Param authorization header string true "authorization"
 // @Param identity query string true "identity"
@@ -107,7 +107,7 @@ func CategoryDelete(c *gin.Context) {
 }
 
 // CategoryModify
-// @Tags 私有方法
+// @Tags 管理员私有方法
 // @Summary 分类修改
 // @Param authorization header string true "authorization"
 // @Param identity query string true "identity"

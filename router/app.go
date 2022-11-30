@@ -41,5 +41,11 @@ func Router() *gin.Engine {
 		authAdmin.DELETE("/category-delete", service.CategoryDelete)
 		authAdmin.PUT("/category-modify", service.CategoryModify)
 	}
+
+	// private method of user
+	authUser := r.Group("/user").Use(middlewares.AuthUserCheck())
+	{
+		authUser.POST("/submit", service.Submit)
+	}
 	return r
 }

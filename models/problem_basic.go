@@ -13,6 +13,8 @@ type ProblemBasic struct {
 	MaxMemory       int                `gorm:"column:max_memory; type:int; json:"max_memory"`     // max memory of the problem
 	ProblemCategory []*ProblemCategory `gorm:"foreignKey:problem_id; references:id; json:"problem_categories"`
 	TestCases       []*TestCase        `gorm:"foreignKey:problem_identity; references:identity; json:"test_cases"`
+	PassNum         int                `gorm:"column:pass_num; type:int; json:"pass_num"`        // number of people who pass the problem
+	SubmitNum       int64              `gorm:"column:submit_num; type:bigint; json:"submit_num"` // number of people who submit the problem
 }
 
 func (table *ProblemBasic) TableName() string {

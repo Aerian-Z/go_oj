@@ -1,13 +1,21 @@
 package helper
 
 import (
+	"GOOJ/models"
+	"bytes"
 	"crypto/md5"
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/jordan-wright/email"
 	uuid "github.com/satori/go.uuid"
+	"io"
+	"log"
 	"math/rand"
 	"net/smtp"
+	"os"
+	"os/exec"
+	"runtime"
+	"sync"
 	"time"
 )
 
@@ -83,4 +91,100 @@ func GetRandomCode() string {
 
 func GetUUID() string {
 	return uuid.NewV4().String()
+}
+
+func CodeSave(code []byte) (string, error) {
+	dirName := "code" + GetUUID()
+	path := dirName + "/main.go"
+	err := os.Mkdir(dirName, 0777)
+	if err != nil {
+		return "", err
+	}
+	file, err := os.Create(path)
+	defer func(file *os.File) {
+		err = file.Close()
+		if err != nil {
+			return
+		}
+	}(file)
+
+	if err != nil {
+		return "", err
+	}
+
+	_, err = file.Write(code)
+	if err != nil {
+		return "", err
+	}
+	return path, nil
+}
+
+func JudgeCode(pb *models.ProblemBasic, path string) int {
+	status := 0
+	passCount := 0
+	// worry answer
+	WA := make(chan int)
+	// out of memory
+	OOM := make(chan int)
+	// compilation error
+	CE := make(chan int)
+	var lock sync.Mutex
+
+	for _, testCase := range pb.TestCases {
+		testCase := testCase
+		go func() {
+			cmd := exec.Command("go", "run", path)
+			var out, stderr bytes.Buffer
+			cmd.Stdout = &out
+			cmd.Stderr = &stderr
+			stdinPipe, err := cmd.StdinPipe()
+			if err != nil {
+				log.Fatalln(err)
+				return
+			}
+			_, err = io.WriteString(stdinPipe, testCase.Input)
+			if err != nil {
+				return
+			}
+			var bm runtime.MemStats
+			runtime.ReadMemStats(&bm)
+			if err = cmd.Run(); err != nil {
+				log.Println(err, stderr.String())
+				if err.Error() == "exit status 2" {
+					CE <- 1
+					return
+				}
+			}
+			var em runtime.MemStats
+			runtime.ReadMemStats(&em)
+			if out.String() != testCase.Output {
+				WA <- 1
+				return
+			}
+			if (em.Alloc-bm.Alloc)/1024 > uint64(pb.MaxMemory) {
+				OOM <- 1
+				return
+			}
+
+			lock.Lock()
+			passCount++
+			lock.Unlock()
+		}()
+	}
+
+	select {
+	case <-WA:
+		status = 2
+	case <-OOM:
+		status = 4
+	case <-CE:
+		status = 5
+	case <-time.After(time.Millisecond * time.Duration(pb.MaxRuntime)):
+		if passCount == len(pb.TestCases) {
+			status = 1
+		} else {
+			status = 3
+		}
+	}
+	return status
 }

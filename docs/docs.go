@@ -19,7 +19,7 @@ const docTemplate = `{
         "/admin/category-create": {
             "post": {
                 "tags": [
-                    "私有方法"
+                    "管理员私有方法"
                 ],
                 "summary": "分类创建",
                 "parameters": [
@@ -57,7 +57,7 @@ const docTemplate = `{
         "/admin/category-delete": {
             "delete": {
                 "tags": [
-                    "私有方法"
+                    "管理员私有方法"
                 ],
                 "summary": "分类删除",
                 "parameters": [
@@ -89,7 +89,7 @@ const docTemplate = `{
         "/admin/category-modify": {
             "put": {
                 "tags": [
-                    "私有方法"
+                    "管理员私有方法"
                 ],
                 "summary": "分类修改",
                 "parameters": [
@@ -133,7 +133,7 @@ const docTemplate = `{
         "/admin/problem-create": {
             "post": {
                 "tags": [
-                    "私有方法"
+                    "管理员私有方法"
                 ],
                 "summary": "问题创建",
                 "parameters": [
@@ -197,7 +197,7 @@ const docTemplate = `{
         "/admin/problem-modify": {
             "put": {
                 "tags": [
-                    "私有方法"
+                    "管理员私有方法"
                 ],
                 "summary": "问题修改",
                 "parameters": [
@@ -566,6 +566,47 @@ const docTemplate = `{
                 "responses": {
                     "200": {
                         "description": "{\"code\":\"200\",\"msg\":\"\"}",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/submit": {
+            "post": {
+                "tags": [
+                    "用户私有方法"
+                ],
+                "summary": "代码提交",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "authorization",
+                        "name": "authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "problem_identity",
+                        "name": "problem_identity",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "description": "code",
+                        "name": "code",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{\"code\":\"200\",\"data\":\"\"}",
                         "schema": {
                             "type": "string"
                         }
