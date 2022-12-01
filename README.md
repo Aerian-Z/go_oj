@@ -30,18 +30,17 @@ Install mail
 go get github.com/jordan-wright/email
 ```
 
-
-* [ ] OJ
+* [X] OJ
   * [X] User Module
     * [X] register
     * [X] login
     * [X] user detail
-  * [ ] Problem Module
+  * [X] Problem Module
     * [X] problem list、problem detail
-    * [ ] problem create
-    * [ ] problem modify
-  * [ ] Judge Module
+    * [X] problem create
+    * [X] problem modify
+  * [X] Judge Module
     * [X] submit list
-    * [ ] submit and judge
-  * [ ] Rank Module
-    * [ ] rank list
+    * [X] submit and judge
+  * [X] Rank Module
+    * [X] rank list
