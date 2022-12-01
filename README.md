@@ -1,4 +1,4 @@
-# GoOJ
+# go_oj
 
 Front-end -- Vue、ElementUI
 
