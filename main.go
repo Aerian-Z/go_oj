@@ -1,8 +1,6 @@
 package main
 
-import (
-	"GOOJ/router"
-)
+import "go_oj/router"
 
 func main() {
 	r := router.Router()
