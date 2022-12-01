@@ -1,4 +1,4 @@
-module GOOJ
+module go_oj
 
 go 1.19
 

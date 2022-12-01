@@ -1,14 +1,15 @@
 package service
 
 import (
-	"GOOJ/define"
-	"GOOJ/helper"
-	"GOOJ/models"
 	"encoding/json"
-	"gorm.io/gorm"
+	"go_oj/define"
+	"go_oj/helper"
+	"go_oj/models"
 	"log"
 	"net/http"
 	"strconv"
+
+	"gorm.io/gorm"
 
 	"github.com/gin-gonic/gin"
 )

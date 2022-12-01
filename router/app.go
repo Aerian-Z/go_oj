@@ -1,9 +1,10 @@
 package router
 
 import (
-	_ "GOOJ/docs"
-	"GOOJ/middlewares"
-	"GOOJ/service"
+	_ "go_oj/docs"
+	"go_oj/middlewares"
+	"go_oj/service"
+
 	"github.com/gin-gonic/gin"
 	swaggerfiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"

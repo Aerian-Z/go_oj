@@ -1,15 +1,16 @@
 package service
 
 import (
-	"GOOJ/define"
-	"GOOJ/helper"
-	"GOOJ/models"
-	"github.com/gin-gonic/gin"
-	"gorm.io/gorm"
+	"go_oj/define"
+	"go_oj/helper"
+	"go_oj/models"
 	"io"
 	"log"
 	"net/http"
 	"strconv"
+
+	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 )
 
 // GetSubmitList

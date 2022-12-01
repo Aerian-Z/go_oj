@@ -1,13 +1,14 @@
 package service
 
 import (
-	"GOOJ/define"
-	"GOOJ/helper"
-	"GOOJ/models"
-	"github.com/gin-gonic/gin"
+	"go_oj/define"
+	"go_oj/helper"
+	"go_oj/models"
 	"log"
 	"net/http"
 	"strconv"
+
+	"github.com/gin-gonic/gin"
 )
 
 // GetCategoryList

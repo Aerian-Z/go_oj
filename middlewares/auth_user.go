@@ -1,9 +1,10 @@
 package middlewares
 
 import (
-	"GOOJ/helper"
-	"github.com/gin-gonic/gin"
+	"go_oj/helper"
 	"net/http"
+
+	"github.com/gin-gonic/gin"
 )
 
 func AuthUserCheck() gin.HandlerFunc {

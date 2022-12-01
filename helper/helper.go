@@ -1,13 +1,10 @@
 package helper
 
 import (
-	"GOOJ/models"
 	"bytes"
 	"crypto/md5"
 	"fmt"
-	"github.com/dgrijalva/jwt-go"
-	"github.com/jordan-wright/email"
-	uuid "github.com/satori/go.uuid"
+	"go_oj/models"
 	"io"
 	"log"
 	"math/rand"
@@ -17,6 +14,10 @@ import (
 	"runtime"
 	"sync"
 	"time"
+
+	"github.com/dgrijalva/jwt-go"
+	"github.com/jordan-wright/email"
+	uuid "github.com/satori/go.uuid"
 )
 
 type UserClaims struct {
